@@ -4,6 +4,7 @@ FT_LIBS= ft_printf/libftprintf.a libft/libft.a
 CFILES= main.c \
 		get_next_line_utils.c \
 		get_next_line.c \
+		pipex_tooles.c
 
 OFILES=$(CFILES:.c=.o)
 
@@ -12,12 +13,13 @@ OFILES=$(CFILES:.c=.o)
 
 all: $(NAME)
 
-$(NAME): libs $(OFILES)
-	@cc $(CFLAGS) $(OFILES) $(FT_LIBS) -o $(NAME)
-
-libs:
+$(NAME): $(OFILES)
 	@cd libft && make && make bonus
 	@cd ft_printf && make
+	cc $(CFLAGS) $(OFILES) $(FT_LIBS) -o $(NAME)
+
+# libs:
+	
 
 clean:
 	@rm -f $(OFILES)
@@ -31,15 +33,18 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: clean libs
 
 #delete this
 # -------------------------------
 TST= test.c \
 	get_next_line_utils.c \
-	get_next_line.c \
+	get_next_line.c 
 
 OTST=$(TST:.c=.o)
-test:  libs $(OTST)
+test: $(OTST)
+	@cd libft && make && make bonus
+	@cd ft_printf && make
 	cc $(CFLAGS) $(OTST) $(FT_LIBS) -o test
 # -------------------------------------------
+
+.PHONY: clean libs test

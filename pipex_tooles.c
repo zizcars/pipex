@@ -1,35 +1,41 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   test.c                                             :+:      :+:    :+:   */
+/*   pipex_tooles.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: Achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/03/22 19:50:04 by Achakkaf          #+#    #+#             */
-/*   Updated: 2024/03/22 22:54:45 by Achakkaf         ###   ########.fr       */
+/*   Created: 2024/03/22 22:34:42 by Achakkaf          #+#    #+#             */
+/*   Updated: 2024/03/22 23:13:50 by Achakkaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-void error(char *error_massege)
+/// @brief print error message using perror
+/// @param error_massege
+void error(char *error_message)
 {
-	perror(error_massege);
+	perror(error_message);
 	exit(1);
 }
-int main(int argc, char **argv)
+
+/// @brief find path of a command using whereis <command>
+/// @param command 
+/// @param options 
+/// @return path of the command
+char *find_path(char *command, char *options)
 {
 	pid_t pid;
+	int fd;
+	char *str;
 
-	if (argc != 2)
-		exit(1);
-
+	str = NULL;
 	pid = fork();
 	if (pid < 0)
-		perror("error");
+		error("fork failed");
 	else if (pid == 0)
 	{
-		int fd;
 		int dup_check;
 	
 		fd = open("path", O_CREAT | O_RDWR, 0666);
@@ -38,20 +44,19 @@ int main(int argc, char **argv)
 		dup_check = dup2(fd, STROUT);
 		if (dup_check < 0)
 			error("fieled in dup2");
-		char *com[] = {"/usr/bin/whereis", argv[1], NULL};
+		char *com[] = {"/usr/bin/whereis", command, options, NULL};
 		execve("/usr/bin/whereis", com, NULL);
 		error("fieled in execve");
 	}
 	else
 	{
-		int fd;
 		fd = open("path", O_CREAT | O_RDWR, 0666);
 		if (fd < 0)
-			error("can't open file prant");
+			error("can't open file prent");
 		waitpid(pid, NULL, 0);
-		char *str = get_next_line(fd);
-		ft_printf("%s", str);
+		str = get_next_line(fd);
 		close(fd);
 		unlink("path");
 	}
+	return (str);
 }
