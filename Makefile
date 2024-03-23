@@ -1,10 +1,11 @@
 NAME=pipex
-CFLAGS= -Wall -Wextra -Werror -fsanitize=address
+CFLAGS= -Wall -Wextra -Werror #-fsanitize=address
 FT_LIBS= ft_printf/libftprintf.a libft/libft.a
 CFILES= main.c \
 		get_next_line_utils.c \
 		get_next_line.c \
-		pipex_tooles.c
+		pipex_tooles.c \
+		# split_cmd.c 
 
 OFILES=$(CFILES:.c=.o)
 
@@ -38,7 +39,8 @@ re: fclean all
 # -------------------------------
 TST= test.c \
 	get_next_line_utils.c \
-	get_next_line.c 
+	get_next_line.c \
+	# split_cmd.c 
 
 OTST=$(TST:.c=.o)
 test: $(OTST)

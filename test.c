@@ -6,7 +6,7 @@
 /*   By: Achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/22 19:50:04 by Achakkaf          #+#    #+#             */
-/*   Updated: 2024/03/22 22:54:45 by Achakkaf         ###   ########.fr       */
+/*   Updated: 2024/03/23 22:05:42 by Achakkaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,41 +17,31 @@ void error(char *error_massege)
 	perror(error_massege);
 	exit(1);
 }
-int main(int argc, char **argv)
+int main()
 {
+	int fd[2]; //0: read and 1: write
 	pid_t pid;
 
-	if (argc != 2)
-		exit(1);
-
+	if (pipe(fd) < 0)
+		error("problem in pipe");
 	pid = fork();
 	if (pid < 0)
-		perror("error");
+		error("problem in fork");
 	else if (pid == 0)
 	{
-		int fd;
-		int dup_check;
-	
-		fd = open("path", O_CREAT | O_RDWR, 0666);
-		if (fd < 0)
-			error("can't open file in child");
-		dup_check = dup2(fd, STROUT);
-		if (dup_check < 0)
-			error("fieled in dup2");
-		char *com[] = {"/usr/bin/whereis", argv[1], NULL};
-		execve("/usr/bin/whereis", com, NULL);
-		error("fieled in execve");
+		close(fd[0]);
+		write(fd[1], "hello how are you", 18);
+		close(fd[1]);
 	}
 	else
 	{
-		int fd;
-		fd = open("path", O_CREAT | O_RDWR, 0666);
-		if (fd < 0)
-			error("can't open file prant");
-		waitpid(pid, NULL, 0);
-		char *str = get_next_line(fd);
-		ft_printf("%s", str);
-		close(fd);
-		unlink("path");
+		wait(NULL);
+		char *com[] = {"cat", NULL};
+		close(fd[1]);
+		dup2(fd[0], STDIN);
+		close(fd[0]);
+		execve("/bin/cat", com, NULL);
+		error("fieled in execve parent");
 	}
+
 }

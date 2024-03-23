@@ -6,7 +6,7 @@
 /*   By: Achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 16:36:33 by Achakkaf          #+#    #+#             */
-/*   Updated: 2024/03/22 23:08:19 by Achakkaf         ###   ########.fr       */
+/*   Updated: 2024/03/23 20:44:05 by Achakkaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,11 +25,14 @@
 # include "libft/libft.h"
 # include "get_next_line.h"
 
-# define STRIN 0
-# define STROUT 1
-# define STRERR 2
+# define STDIN 0
+# define STDOUT 1
+# define STDERR 2
 
-char	*find_path(char *command, char *options);
+char	*find_path(char *command);
 void	error(char *error_message);
+void    exec_command(char *command);
+void    redirection(int new_fd, int old_fd);
+char    **split_cmd(char *command);
 
 #endif

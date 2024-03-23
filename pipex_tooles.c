@@ -6,7 +6,7 @@
 /*   By: Achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/22 22:34:42 by Achakkaf          #+#    #+#             */
-/*   Updated: 2024/03/22 23:13:50 by Achakkaf         ###   ########.fr       */
+/*   Updated: 2024/03/23 20:43:44 by Achakkaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,11 +20,32 @@ void error(char *error_message)
 	exit(1);
 }
 
+/// @brief execute whereis command to find a path of a command
+/// @param command
+void exec_whereis(char *command)
+{
+	int fd;
+	int dup_check;
+	char *cmd[3];
+
+	cmd[0] = "whereis";
+	cmd[1] = command;
+	cmd[2] = NULL;
+	fd = open("path", O_CREAT | O_RDWR, 0666);
+	if (fd < 0)
+		error("can't open file in child");
+	dup_check = dup2(fd, STDOUT);
+	if (dup_check < 0)
+		error("fieled in dup2");
+	execve("/usr/bin/whereis", cmd, NULL);
+	error("fieled in execve");
+}
+
 /// @brief find path of a command using whereis <command>
-/// @param command 
-/// @param options 
+/// @param command
+/// @param options
 /// @return path of the command
-char *find_path(char *command, char *options)
+char *find_path(char *command)
 {
 	pid_t pid;
 	int fd;
@@ -35,19 +56,7 @@ char *find_path(char *command, char *options)
 	if (pid < 0)
 		error("fork failed");
 	else if (pid == 0)
-	{
-		int dup_check;
-	
-		fd = open("path", O_CREAT | O_RDWR, 0666);
-		if (fd < 0)
-			error("can't open file in child");
-		dup_check = dup2(fd, STROUT);
-		if (dup_check < 0)
-			error("fieled in dup2");
-		char *com[] = {"/usr/bin/whereis", command, options, NULL};
-		execve("/usr/bin/whereis", com, NULL);
-		error("fieled in execve");
-	}
+		exec_whereis(command);
 	else
 	{
 		fd = open("path", O_CREAT | O_RDWR, 0666);
@@ -59,4 +68,25 @@ char *find_path(char *command, char *options)
 		unlink("path");
 	}
 	return (str);
+}
+
+void exec_command(char *command)
+{
+	char *cmd_path;
+	char **cmd;
+	
+	cmd = ft_split(command, ' ');
+	cmd_path = find_path(cmd[0]);
+	cmd_path[ft_strlen(cmd_path) - 1] = '\0'; //remove /n from the path
+	execve(cmd_path, cmd, NULL);
+	error("Error in execve");
+}
+
+void redirection(int new_fd, int old_fd)
+{
+	int check;
+	
+	check = dup2(new_fd, old_fd);
+	if (check < 0)
+		error("Error in dup2");
 }

@@ -6,18 +6,44 @@
 /*   By: Achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/22 16:36:42 by Achakkaf          #+#    #+#             */
-/*   Updated: 2024/03/22 23:12:27 by Achakkaf         ###   ########.fr       */
+/*   Updated: 2024/03/23 22:29:48 by Achakkaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-
 int main(int argc, char **argv)
 {
-	if (argc == 1)
+	pid_t pid;
+	int fd;
+	int pipfd[2];
+
+	if (argc != 5)
 		exit(0);
-	char **command;
-	command = ft_split(argv[1], ' ');
-	ft_printf("%s", find_path(command[0], command[1]));
+	if (pipe(pipfd))
+		error("problem in pipe");
+	pid = fork();
+	if (pid < 0)
+		error("Error in fork <main>");
+	else if (pid == 0)
+	{
+		close(pipfd[0]);
+		fd = open(argv[1], O_RDONLY);
+		if (fd < 0)
+			error("can't open file for stdin");
+		redirection(fd, STDIN);
+		redirection(pipfd[1], STDOUT);
+		close(pipfd[1]);
+		exec_command(argv[2]);
+	}
+	else
+	{
+		wait(NULL);
+		close(pipfd[1]);
+		fd = open(argv[4], O_CREAT | O_RDWR, 0666);
+		redirection(pipfd[0], STDIN);
+		redirection(fd, STDOUT);
+		close(pipfd[0]);
+		exec_command(argv[3]);
+	}
 }
