@@ -6,7 +6,7 @@
 /*   By: Achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/22 22:34:42 by Achakkaf          #+#    #+#             */
-/*   Updated: 2024/03/23 20:43:44 by Achakkaf         ###   ########.fr       */
+/*   Updated: 2024/03/23 22:32:08 by Achakkaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,8 @@ char *find_path(char *command)
 	return (str);
 }
 
+/// @brief execute a command
+/// @param command 
 void exec_command(char *command)
 {
 	char *cmd_path;
@@ -82,6 +84,9 @@ void exec_command(char *command)
 	error("Error in execve");
 }
 
+/// @brief redirection a file descriptor
+/// @param new_fd 
+/// @param old_fd 
 void redirection(int new_fd, int old_fd)
 {
 	int check;

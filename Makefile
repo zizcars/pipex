@@ -5,6 +5,7 @@ CFILES= main.c \
 		get_next_line_utils.c \
 		get_next_line.c \
 		pipex_tooles.c \
+		exec.c \
 		# split_cmd.c 
 
 OFILES=$(CFILES:.c=.o)
