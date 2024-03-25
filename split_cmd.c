@@ -6,7 +6,7 @@
 /*   By: Achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/12 09:41:34 by Achakkaf          #+#    #+#             */
-/*   Updated: 2024/03/23 23:02:54 by Achakkaf         ###   ########.fr       */
+/*   Updated: 2024/03/25 16:11:47 by Achakkaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,56 +17,48 @@ int	skip_space(char *str)
 	int spaces;
 
 	spaces = 0;
-	while (str[spaces] && str[spaces] == ' ')
+	if(str == NULL)
+		return (0);
+	while ((str[spaces] >= 9 && str[spaces] <= 13) || str[spaces] == 32)
 		spaces++;
 	return (spaces);
 }
-int count_words(char *str)
-{
-	int i; //|hwlf ssdf  |
-	int j;
-	int count;
 
-	count = 0;
+void	split_command(char *cmd,char **command,char **args)
+{
+	int i;
+
+	if (cmd ==  NULL)
+		return;
+	cmd += skip_space(cmd);
 	i = 0;
-	while(str[i])
-	{
-		while(str[i] && str[i] == ' ')
-			i++;
-		j = i;
-		while(str[j] && str[j] != ' ')
-			j++;
-		if (j - i > 0)
-			count++;
-		if (count > 1)
-			return (count);
-		i = j;
-	}
-	return (count);
+	while (cmd[i] && cmd[i] != ' ')
+		i++;
+	*command = malloc(sizeof(char) * (i+1));
+	if (*command == NULL)
+		return;
+	ft_strlcpy(*command, cmd, i+1);
+	cmd += i;
+	cmd += skip_space(cmd);
+	if (*cmd == '\0')
+		return;
+	i = 0;
+	while (cmd[i])
+		i++;
+	*args = malloc(sizeof(char) * (i+1));
+	if (*args == NULL)
+		return;
+	ft_strlcpy(*args, cmd, i+1);
 }
-// char	**split_cmd(char *command)
-// {
-// 	char **cmd;
-// 	int i;
-// 	int spaces;
-// 	int n;
 
-// 	n = 2;
-// 	spaces = 0;
-// 	i = 0;
-// 	command += skip_space(command);
-// 	while (command[i] && command[i] != ' ')
-// 		i++;
-// 	if (command[i] != '\0')
-// 		n = 3;
-// 	cmd = malloc(sizeof(char *) * n);
-// 	ft_substr(command, 0, i);
+// #include <stdio.h>
+// #include "libft/libft.h"
+// int main()
+// {
+// 	char *str = "ls     -la   ";
+// 	char *command;
+// 	char *args;
+// 	split_command(str, &command, &args);
+// 	execve("/usr/bin/ls")
+// 	// printf("command:|%s|\nargs:|%s|\n", command, args);
 // }
-#include <stdio.h>
-int main()
-{
-	printf("%d\n", count_words("hello word"));
-	printf("%d\n", count_words("    hello word    "));
-	printf("%d\n", count_words("    hello word"));
-	printf("%d\n", count_words("hello word     "));
-}
