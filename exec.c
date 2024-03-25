@@ -6,7 +6,7 @@
 /*   By: Achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/22 22:34:42 by Achakkaf          #+#    #+#             */
-/*   Updated: 2024/03/25 21:48:56 by Achakkaf         ###   ########.fr       */
+/*   Updated: 2024/03/25 22:35:15 by Achakkaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,9 +62,11 @@ char *find_path(char *command)
 		wait(NULL);
 		fd = open("path", O_CREAT | O_RDWR, 0666);
 		if (fd < 0)
-			error("can't open file prent");
+			error("can't open file parent");
 		// waitpid(pid, NULL, 0);
 		str = get_next_line(fd);
+		if (str == NULL)
+			error("Command not found");
 		close(fd);
 		unlink("path");
 	}
@@ -86,6 +88,8 @@ void exec_command(char *command)
 	cmd[1] = args;
 	cmd[2] = NULL;
 	cmd_path = find_path(cmd[0]);
+	// if (access(cmd_path, X_O) == -1)
+	// 	error()
 	cmd_path[ft_strlen(cmd_path) - 1] = '\0'; //remove /n from the path
 	// system("leaks pipex");
 	execve(cmd_path, cmd, NULL);

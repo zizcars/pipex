@@ -6,7 +6,7 @@
 /*   By: Achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/22 16:36:42 by Achakkaf          #+#    #+#             */
-/*   Updated: 2024/03/25 21:46:38 by Achakkaf         ###   ########.fr       */
+/*   Updated: 2024/03/25 22:42:06 by Achakkaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ int main(int argc, char **argv)
 		child_proc(argv, pipfd);
 	else
 	{
-		// wait(NULL);
+		wait(NULL);
 		close(pipfd[1]);
 		fd = open(argv[4], O_CREAT | O_RDWR, 0666);
 		redirection(pipfd[0], STDIN);
