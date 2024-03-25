@@ -4,9 +4,9 @@ FT_LIBS= ft_printf/libftprintf.a libft/libft.a
 CFILES= main.c \
 		get_next_line_utils.c \
 		get_next_line.c \
-		pipex_tooles.c \
+		split_cmd.c \
 		exec.c \
-		# split_cmd.c 
+		# pipex_tooles.c \
 
 OFILES=$(CFILES:.c=.o)
 

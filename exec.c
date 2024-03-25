@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex_tooles.c                                     :+:      :+:    :+:   */
+/*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: Achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/22 22:34:42 by Achakkaf          #+#    #+#             */
-/*   Updated: 2024/03/23 22:32:08 by Achakkaf         ###   ########.fr       */
+/*   Updated: 2024/03/25 21:48:56 by Achakkaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,10 +59,11 @@ char *find_path(char *command)
 		exec_whereis(command);
 	else
 	{
+		wait(NULL);
 		fd = open("path", O_CREAT | O_RDWR, 0666);
 		if (fd < 0)
 			error("can't open file prent");
-		waitpid(pid, NULL, 0);
+		// waitpid(pid, NULL, 0);
 		str = get_next_line(fd);
 		close(fd);
 		unlink("path");
@@ -75,11 +76,18 @@ char *find_path(char *command)
 void exec_command(char *command)
 {
 	char *cmd_path;
-	char **cmd;
-	
-	cmd = ft_split(command, ' ');
+	char *comd;
+	char *args;
+	char *cmd[3];
+
+	// cmd = ft_split(command, ' ');
+	split_command(command, &comd, &args);
+	cmd[0] = comd;
+	cmd[1] = args;
+	cmd[2] = NULL;
 	cmd_path = find_path(cmd[0]);
 	cmd_path[ft_strlen(cmd_path) - 1] = '\0'; //remove /n from the path
+	// system("leaks pipex");
 	execve(cmd_path, cmd, NULL);
 	error("Error in execve");
 }

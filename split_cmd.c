@@ -6,7 +6,7 @@
 /*   By: Achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/12 09:41:34 by Achakkaf          #+#    #+#             */
-/*   Updated: 2024/03/25 16:11:47 by Achakkaf         ###   ########.fr       */
+/*   Updated: 2024/03/25 18:19:45 by Achakkaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,23 +42,23 @@ void	split_command(char *cmd,char **command,char **args)
 	cmd += skip_space(cmd);
 	if (*cmd == '\0')
 		return;
-	i = 0;
-	while (cmd[i])
-		i++;
-	*args = malloc(sizeof(char) * (i+1));
+	int len = ft_strlen(cmd);
+	while (len != 0 && cmd[len - 1] == ' ')
+		len--;
+	*args = malloc(sizeof(char) * (len+1));
 	if (*args == NULL)
 		return;
-	ft_strlcpy(*args, cmd, i+1);
+	ft_strlcpy(*args, cmd, len+1);
 }
 
 // #include <stdio.h>
 // #include "libft/libft.h"
 // int main()
 // {
-// 	char *str = "ls     -la   ";
+// 	char *str = "awk {print $1}";
 // 	char *command;
 // 	char *args;
 // 	split_command(str, &command, &args);
-// 	execve("/usr/bin/ls")
-// 	// printf("command:|%s|\nargs:|%s|\n", command, args);
+// 	// execve("/usr/bin/ls");
+// 	printf("command:|%s|\nargs:|%s|\n", command, args);
 // }
