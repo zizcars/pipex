@@ -6,7 +6,7 @@
 /*   By: Achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/12 09:41:34 by Achakkaf          #+#    #+#             */
-/*   Updated: 2024/03/27 20:48:22 by Achakkaf         ###   ########.fr       */
+/*   Updated: 2024/03/27 23:08:49 by Achakkaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,54 +50,61 @@
 // 	ft_strlcpy(*args, cmd, len + 1);
 // }
 
-char *path_(char *p, char *command, int i)
-{
-	char **all_paths;
-	char *path;
-	char *tmp;
+// ls -la
+// git status helep masdf
+// ls
+//
 
-	all_paths = ft_split(p, ':');
-	while (all_paths[i])
+char *quotes_(char **command, int i)
+{
+	char *tmp;
+	char *tmp2;
+
+	while (command[i])
 	{
-		path = ft_strjoin(all_paths[i], "/");
-		free(all_paths[i]);
-		tmp = path;
-		path = ft_strjoin(path, command);
-		free(tmp);
-		if (access(path, F_OK) == 0)
-		{
-			while(all_paths[i])
-				free(all_paths[++i]);
-			free(all_paths);
-			return (path);
-		}
-		free(path);
-		path = NULL;
+		tmp2 = tmp;
+		free(tmp2);
+		tmp = ft_strjoin(tmp, command[i]);
+		tmp2 = tmp;
+		tmp = ft_strjoin(tmp, " ");
+		free(tmp2);
 		i++;
 	}
-	free(all_paths);
-	return (NULL);
+	tmp2 = tmp;
+	tmp = ft_substr(tmp, 1, ft_strlen(tmp) - 3);
+	free(tmp2);
+	return (tmp);
 }
 
-char *find_path_v2(char *command, char **env)
-{
-	char *p;
-
-	p = env[2];
-	while (*p != '=')
-		p++;
-	p++;
-	return (path_(p, command, 0));
-}
-
-// #include <stdio.h>
-// #include "libft/libft.h"
-// int main(int argc, char **argv, char **env)
+// char **split_command(char *cmd)
 // {
-// 	printf("path:|%s|\n", find_path_v2("ls", env));
-// 	printf("path:|%s|\n", find_path_v2("cd", env));
-// 	printf("path:|%s|\n", find_path_v2("pwd", env));
-// 	printf("path:|%s|\n", find_path_v2("grep", env));
-// 	printf("path:|%s|\n", find_path_v2("cldsdf", env));
-// 	system("leaks a.out");
+// 	char **rand_cmd;
+// 	char **command;
+// 	char *str;
+// 	char *tmp;
+// 	int count = 1;
+
+// 	str = NULL;
+// 	rand_cmd = ft_split(cmd, ' ');
+// 	if (ft_strchr(rand_cmd[1], '-') && !(ft_strchr(rand_cmd[1], '"') || ft_strchr(rand_cmd[1], '\'')))
+// 	{
+// 		if (ft_strchr(rand_cmd[2], '"') || ft_strchr(rand_cmd[2], '\''))
+// 			str = quotes_(command, 1);
+// 	}
+// 	else
+// 	{
+// 		if (ft_strchr(rand_cmd[1], '"') || ft_strchr(rand_cmd[1], '\''))
+// 			str = quotes_(rand_cmd, 1);
+		
+// 	}
 // }
+
+#include <stdio.h>
+#include "libft/libft.h"
+
+int main(int argc, char **argv, char **env)
+{
+	char *cmd[] = {"\"hello", "how", "you\"", "sd",NULL};
+	printf("%s\n", quotes_(cmd, 0));
+	// system("leaks a.out");
+}
