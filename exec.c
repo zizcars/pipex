@@ -6,7 +6,7 @@
 /*   By: Achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/22 22:34:42 by Achakkaf          #+#    #+#             */
-/*   Updated: 2024/03/25 22:35:15 by Achakkaf         ###   ########.fr       */
+/*   Updated: 2024/03/26 22:17:54 by Achakkaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,14 +31,14 @@ void exec_whereis(char *command)
 	cmd[0] = "whereis";
 	cmd[1] = command;
 	cmd[2] = NULL;
-	fd = open("path", O_CREAT | O_RDWR, 0666);
+	fd = open("path", O_CREAT | O_WRONLY, 0777);
 	if (fd < 0)
-		error("can't open file in child");
+		error("can't creat path file");
 	dup_check = dup2(fd, STDOUT);
 	if (dup_check < 0)
-		error("fieled in dup2");
+		error("failed in dup2 in exec_whereis");
 	execve("/usr/bin/whereis", cmd, NULL);
-	error("fieled in execve");
+	error("can't execute whereis command whereis");
 }
 
 /// @brief find path of a command using whereis <command>
@@ -50,50 +50,53 @@ char *find_path(char *command)
 	pid_t pid;
 	int fd;
 	char *str;
+	int status;
 
 	str = NULL;
 	pid = fork();
 	if (pid < 0)
-		error("fork failed");
+		error("fork failed in find_path");
 	else if (pid == 0)
 		exec_whereis(command);
 	else
 	{
-		wait(NULL);
-		fd = open("path", O_CREAT | O_RDWR, 0666);
+		wait(&status);
+		if (status != 0)
+			exit(status);
+		fd = open("path", O_RDONLY);
 		if (fd < 0)
-			error("can't open file parent");
-		// waitpid(pid, NULL, 0);
+			error("file path not found");
 		str = get_next_line(fd);
 		if (str == NULL)
-			error("Command not found");
+			error("command not found");
 		close(fd);
-		unlink("path");
+		// unlink("path");
 	}
 	return (str);
 }
 
 /// @brief execute a command
 /// @param command 
-void exec_command(char *command)
+void exec_command(char *command, char **env)
 {
 	char *cmd_path;
+	char **cmd;
 	char *comd;
 	char *args;
-	char *cmd[3];
 
-	// cmd = ft_split(command, ' ');
-	split_command(command, &comd, &args);
-	cmd[0] = comd;
-	cmd[1] = args;
-	cmd[2] = NULL;
+	if (ft_strchr(command, '-'))
+		cmd = ft_split(command, ' ');
+	else
+	{
+		split_command(command, &comd, &args);
+		cmd[0] = comd;
+		cmd[1] = args;
+		cmd[2] = NULL; 
+	}
 	cmd_path = find_path(cmd[0]);
-	// if (access(cmd_path, X_O) == -1)
-	// 	error()
-	cmd_path[ft_strlen(cmd_path) - 1] = '\0'; //remove /n from the path
-	// system("leaks pipex");
-	execve(cmd_path, cmd, NULL);
-	error("Error in execve");
+	cmd_path[ft_strlen(cmd_path) - 1] = '\0';
+	execve(cmd_path, cmd, env);
+	error("execve:");
 }
 
 /// @brief redirection a file descriptor
@@ -105,5 +108,5 @@ void redirection(int new_fd, int old_fd)
 	
 	check = dup2(new_fd, old_fd);
 	if (check < 0)
-		error("Error in dup2");
+		error("can't dup2 in redirection");
 }

@@ -6,7 +6,7 @@
 /*   By: Achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 16:36:33 by Achakkaf          #+#    #+#             */
-/*   Updated: 2024/03/25 21:01:44 by Achakkaf         ###   ########.fr       */
+/*   Updated: 2024/03/26 22:16:04 by Achakkaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,9 @@
 # define STDERR 2
 
 char	*find_path(char *command);
+int     skip_space(char *str);
 void	error(char *error_message);
-void    exec_command(char *command);
+void    exec_command(char *command, char **env);
 void    redirection(int new_fd, int old_fd);
 void    split_command(char *cmd, char **command, char **args);
 

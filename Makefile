@@ -6,7 +6,6 @@ CFILES= main.c \
 		get_next_line.c \
 		split_cmd.c \
 		exec.c \
-		# pipex_tooles.c \
 
 OFILES=$(CFILES:.c=.o)
 
@@ -36,18 +35,4 @@ fclean: clean
 re: fclean all
 
 
-#delete this
-# -------------------------------
-TST= test.c \
-	get_next_line_utils.c \
-	get_next_line.c \
-	# split_cmd.c 
-
-OTST=$(TST:.c=.o)
-test: $(OTST)
-	@cd libft && make && make bonus
-	@cd ft_printf && make
-	cc $(CFLAGS) $(OTST) $(FT_LIBS) -o test
-# -------------------------------------------
-
-.PHONY: clean libs test
+.PHONY: clean libs
