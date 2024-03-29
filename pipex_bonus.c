@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   pipex_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: Achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/22 16:36:42 by Achakkaf          #+#    #+#             */
-/*   Updated: 2024/03/26 21:58:45 by Achakkaf         ###   ########.fr       */
+/*   Updated: 2024/03/29 22:46:53 by Achakkaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
+#include "pipex_bonus.h"
 
-void child_proc(char **argv, int *pipfd, char **env)
+void child_one(char **argv, int *pipfd, char **env)
 {
 	int fd;
 
@@ -27,48 +27,52 @@ void child_proc(char **argv, int *pipfd, char **env)
 	exec_command(argv[2], env);
 }
 
+void child_two(char **argv, int *pipfd, char **env)
+{
+	int fd;
+
+	fd = open(argv[4], O_CREAT | O_WRONLY, 0666);
+	if (fd < 0)
+		error("can't open file 4 in main");
+	close(pipfd[1]);
+	redirection(fd, STDOUT);
+	redirection(pipfd[0], STDIN);
+	close(pipfd[0]);
+	close(fd);
+	exec_command(argv[3], env);
+}
+
+void c_child(pid_t *child)
+{
+	*child = fork();
+	if (*child < 0)
+		error("fork1 error in main");
+}
+
 int main(int argc, char **argv, char **env)
 {
 	pid_t child1;
 	pid_t child2;
-	int fd;
 	int pipfd[2];
+	int status;
 
 	if (argc != 5)
 		exit(0);
 	if (pipe(pipfd))
 		error("pipe error in main");
-	child1 = fork();
-	if (child1 < 0)
-		error("fork1 error in main");
-	else if (child1 == 0)
-		child_proc(argv, pipfd, env);
-	child2 = fork();
-	if (child2 < 0)
-		error("fork1 error in main");
-	else if (child2 == 0)
-	{
-		// wait(NULL);
-		waitpid(child1, NULL, 0);
-		fd = open(argv[4], O_CREAT | O_WRONLY, 0666);
-		if (fd < 0)
-			error("can't open file 4 in main");
-		close(pipfd[1]);
-		redirection(fd, STDOUT);
-		redirection(pipfd[0], STDIN);
-		close(pipfd[0]);
-		close(fd);
-		exec_command(argv[3], env);
-	}
+	c_child(&child1);
+	if (child1 == 0)
+		child_one(argv, pipfd, env);
+	c_child(&child2);
+	if (child2 == 0)
+		child_two(argv, pipfd, env);
 	else
 	{
-		int status;
 		close(pipfd[0]);
 		close(pipfd[1]);
 		waitpid(child1, &status, 0);
 		waitpid(child2, &status, 0);
-		
 		if (status < 0)
-			error("there is a problem");
+			error("There is a problem");
 	}
 }
