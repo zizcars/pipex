@@ -6,7 +6,7 @@
 /*   By: Achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/22 22:34:42 by Achakkaf          #+#    #+#             */
-/*   Updated: 2024/03/27 21:46:55 by Achakkaf         ###   ########.fr       */
+/*   Updated: 2024/03/29 21:29:40 by Achakkaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ char *path_(char *p, char *command, int i)
 		free(tmp);
 		if (access(path, F_OK) == 0)
 		{
-			while(all_paths[i])
+			while (all_paths[i])
 				free(all_paths[++i]);
 			free(all_paths);
 			return (path);
@@ -105,45 +105,47 @@ char *path_(char *p, char *command, int i)
 char *find_path(char *command, char **env)
 {
 	char *p;
+	char *path;
+	int i;
+	int j;
 
-	p = env[2];
-	while (*p != '=')
-		p++;
-	p++;
+	i = 0;
+	j = 0;
+	path = "PATH=";
+	while (env[i])
+	{
+		while (env[i][j] == path[j] && path[j])
+			j++;
+		if (path[j] == '\0')
+			break;
+		i++;
+	}
+	p = env[i];
+	p += j;
 	return (path_(p, command, 0));
 }
 
 /// @brief execute a command
-/// @param command 
+/// @param command
 void exec_command(char *command, char **env)
 {
 	char *cmd_path;
 	char **cmd;
-	char *comd;
-	char *args;
 
-	if (ft_strchr(command, '-'))
-		cmd = ft_split(command, ' ');
-	else
-	{
-		split_command(command, &comd, &args);
-		cmd[0] = comd;
-		cmd[1] = args;
-		cmd[2] = NULL; 
-	}
+	cmd = split_cmd(command);
 	cmd_path = find_path(cmd[0], env);
-	cmd_path[ft_strlen(cmd_path) - 1] = '\0';
+	// cmd_path[ft_strlen(cmd_path) - 1] = '\0';
 	execve(cmd_path, cmd, env);
 	error("execve:");
 }
 
 /// @brief redirection a file descriptor
-/// @param new_fd 
-/// @param old_fd 
+/// @param new_fd
+/// @param old_fd
 void redirection(int new_fd, int old_fd)
 {
 	int check;
-	
+
 	check = dup2(new_fd, old_fd);
 	if (check < 0)
 		error("can't dup2 in redirection");
