@@ -135,7 +135,7 @@ void exec_command(char *command, char **env)
 	cmd = split_cmd(command);
 	cmd_path = find_path(cmd[0], env);
 	execve(cmd_path, cmd, env);
-	error("execve:");
+	error("command not found");
 }
 
 /// @brief redirection a file descriptor

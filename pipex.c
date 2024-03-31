@@ -12,7 +12,7 @@
 
 #include "pipex.h"
 
-void child_one(char **argv, int *pipfd, char **env)
+void first_child(char **argv, int *pipfd, char **env)
 {
 	int fd;
 
@@ -27,7 +27,7 @@ void child_one(char **argv, int *pipfd, char **env)
 	exec_command(argv[2], env);
 }
 
-void child_two(char **argv, int *pipfd, char **env)
+void last_child(char **argv, int *pipfd, char **env)
 {
 	int fd;
 
@@ -62,10 +62,10 @@ int main(int argc, char **argv, char **env)
 		error("pipe error in main");
 	c_child(&child1);
 	if (child1 == 0)
-		child_one(argv, pipfd, env);
+		first_child(argv, pipfd, env);
 	c_child(&child2);
 	if (child2 == 0)
-		child_two(argv, pipfd, env);
+		last_child(argv, pipfd, env);
 	else
 	{
 		close(pipfd[0]);
