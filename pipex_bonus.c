@@ -6,13 +6,13 @@
 /*   By: Achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/22 16:36:42 by Achakkaf          #+#    #+#             */
-/*   Updated: 2024/03/29 22:46:53 by Achakkaf         ###   ########.fr       */
+/*   Updated: 2024/03/29 23:07:39 by Achakkaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex_bonus.h"
 
-void child_one(char **argv, int *pipfd, char **env)
+void first_child(char **argv, int *pipfd, char **env)
 {
 	int fd;
 
@@ -27,11 +27,11 @@ void child_one(char **argv, int *pipfd, char **env)
 	exec_command(argv[2], env);
 }
 
-void child_two(char **argv, int *pipfd, char **env)
+void last_child(char **argv,int argc ,int *pipfd, char **env)
 {
 	int fd;
 
-	fd = open(argv[4], O_CREAT | O_WRONLY, 0666);
+	fd = open(argv[argc - 1], O_CREAT | O_WRONLY, 0666);
 	if (fd < 0)
 		error("can't open file 4 in main");
 	close(pipfd[1]);
@@ -51,27 +51,35 @@ void c_child(pid_t *child)
 
 int main(int argc, char **argv, char **env)
 {
-	pid_t child1;
-	pid_t child2;
+	pid_t child;
 	int pipfd[2];
 	int status;
+	int i;
 
-	if (argc != 5)
-		exit(0);
+	i = 2;
 	if (pipe(pipfd))
 		error("pipe error in main");
-	c_child(&child1);
-	if (child1 == 0)
-		child_one(argv, pipfd, env);
-	c_child(&child2);
-	if (child2 == 0)
-		child_two(argv, pipfd, env);
+	c_child(&child);
+	if (child == 0)
+		first_child(argv, pipfd, env);
+	// while(i < argc - 1)
+	// {
+	// 	c_child(&child);
+	// 	close(pipfd[1]);
+	// 	redirection(pipfd[0], STDIN);
+	// 	close(pipfd[0]);
+	// 	exec_command(argv[i], env);
+	// 	i++;
+	// }
+	c_child(&child);
+	if (child == 0)
+		last_child(argv,argc ,pipfd, env);
 	else
 	{
 		close(pipfd[0]);
 		close(pipfd[1]);
-		waitpid(child1, &status, 0);
-		waitpid(child2, &status, 0);
+		waitpid(child, &status, 0);
+		// waitpid(child2, &status, 0);
 		if (status < 0)
 			error("There is a problem");
 	}
