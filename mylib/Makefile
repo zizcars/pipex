@@ -3,16 +3,16 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: Achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+         #
+#    By: achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/12/10 17:20:23 by Achakkaf          #+#    #+#              #
-#    Updated: 2024/03/22 21:44:11 by Achakkaf         ###   ########.fr        #
+#    Updated: 2024/03/31 22:48:13 by achakkaf         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CC = cc
 CFLAGS  = -Wall -Wextra -Werror
-NAME = libft.a 
+NAME = mylib.a 
 
 CFILES =	ft_atoi.c \
 			ft_bzero.c \
@@ -47,9 +47,8 @@ CFILES =	ft_atoi.c \
 			ft_putchar_fd.c \
 			ft_putstr_fd.c \
 			ft_putendl_fd.c \
-			ft_putnbr_fd.c 
-
-BFILES =	ft_lstnew_bonus.c \
+			ft_putnbr_fd.c \
+			ft_lstnew_bonus.c \
 			ft_lstadd_front_bonus.c \
 			ft_lstsize_bonus.c \
 			ft_lstlast_bonus.c \
@@ -58,28 +57,32 @@ BFILES =	ft_lstnew_bonus.c \
 			ft_lstclear_bonus.c \
 			ft_lstiter_bonus.c \
 			ft_lstmap_bonus.c \
-			
+			ft_printf.c \
+			ft_putaddress.c \
+			ft_puthex.c \
+			ft_putnbr.c \
+			ft_uputnbr.c \
+			ft_putchar.c \
+			ft_putstr.c \
+			get_next_line.c \
+			get_next_line_utils.c 
 
 OFILES = $(CFILES:.c=.o)
-OBFILES = $(BFILES:.c=.o)
 
 all : $(NAME)
 
 $(NAME): $(OFILES)
 	@ar rc $(NAME) $(OFILES)
 
-%.o:%.c libft.h
+%.o:%.c libft.h ft_printf.h get_next_line.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-bonus : $(OBFILES)
-	@ar rc $(NAME) $(OBFILES)
-
 clean : 
-	@rm -f $(OFILES) $(OBFILES)
+	@rm -f $(OFILES)
 
 fclean: clean
 	@rm -f $(NAME)
 
 re : fclean all
 
-.PHONY: all clean fclean re bonus
+.PHONY: clean 

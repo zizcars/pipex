@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex.h                                            :+:      :+:    :+:   */
+/*   pipex_bonus.h                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
+/*   By: achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 16:36:33 by Achakkaf          #+#    #+#             */
-/*   Updated: 2024/03/29 21:09:33 by Achakkaf         ###   ########.fr       */
+/*   Updated: 2024/03/31 22:29:54 by achakkaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/wait.h>
 
-#include <errno.h>
-
-#include "ft_printf/ft_printf.h"
-#include "libft/libft.h"
-#include "get_next_line.h"
+#include "mylib/ft_printf.h"
+#include "mylib/libft.h"
+#include "mylib/get_next_line.h"
 
 #define STDIN 0
 #define STDOUT 1
@@ -34,6 +33,5 @@ char **split_cmd(char *command);
 void error(char *error_message);
 void exec_command(char *command, char **env);
 void redirection(int new_fd, int old_fd);
-// void    split_command(char *cmd, char **command, char **args);
 
 #endif

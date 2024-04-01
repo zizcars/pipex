@@ -1,48 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line_utils_bonus.c                        :+:      :+:    :+:   */
+/*   get_next_line_utils.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
+/*   By: achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/04 13:22:12 by Achakkaf          #+#    #+#             */
-/*   Updated: 2024/03/29 22:47:19 by Achakkaf         ###   ########.fr       */
+/*   Updated: 2024/03/31 22:39:46 by achakkaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line_bonus.h"
-
-size_t	ft_strlen(const char *s)
-{
-	size_t	len;
-
-	len = 0;
-	if (s == NULL)
-		return (len);
-	while (s[len])
-		len++;
-	return (len);
-}
-
-char	*ft_strdup(const char *s)
-{
-	char	*store;
-	int		i;
-
-	i = 0;
-	if (!s || ft_strlen(s) == 0)
-		return (NULL);
-	store = malloc(sizeof(char) * (ft_strlen(s) + 1));
-	if (!store)
-		return (NULL);
-	while (s[i])
-	{
-		store[i] = s[i];
-		i++;
-	}
-	store[i] = '\0';
-	return (store);
-}
+#include "get_next_line.h"
 
 char	*get_one_line(char *s)
 {

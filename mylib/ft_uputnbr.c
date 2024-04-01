@@ -17,11 +17,6 @@ int	ft_uputnbr(unsigned int u)
 	int	count;
 
 	count = 0;
-	if (u < 0)
-	{
-		count += ft_putchar('-');
-		u = -u;
-	}
 	if (u < 10)
 		count += ft_putchar(u + 48);
 	else
