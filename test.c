@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   test.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
+/*   By: Achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 17:03:38 by Achakkaf          #+#    #+#             */
-/*   Updated: 2024/03/31 22:42:58 by achakkaf         ###   ########.fr       */
+/*   Updated: 2024/04/02 18:10:54 by Achakkaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,20 +18,74 @@
 
 int main(int ac, char **av)
 {
-	char *str;
+	int pipefd[2][2];
+	pid_t pid[3];
+	char *cmd1[] = {"sort", NULL};
+	char *cmd2[] = {"uniq", "-u", NULL};
+	char *cmd3[] = {"grep", "-v", "error", NULL};
 	int i;
-	int fd;
 
-	i = 1;
-	fd = open("infile.txt", O_RDWR);
-	if (fd < 0)
-		printf("ERROR");
-	// printf("str:%s\n", get_next_line(fd));
-	str = malloc(30);
-	while(i)
+	i = 0;
+	while (i < 2)
 	{
-		i = read(fd, str, 20);
-		printf("str:%s\n", str);
+		if(pipe(pipefd[i]) == -1)
+		{
+			perror("problem in pipe");
+			exit(1);
+		}
+		i++;
 	}
-	write(fd, "OK", 2);
+	pid[0] = fork();
+	if (pid[0] == 0)
+	{
+		close(pipefd[0][0]);
+		close(pipefd[1][0]);
+		close(pipefd[1][1]);
+		dup2(pipefd[0][1], STDOUT_FILENO);
+		close(pipefd[0][1]);
+		execve("/usr/bin/sort", cmd1, NULL);
+		perror("execve");
+	}
+	pid[1] = fork();
+	if (pid[1] == 0)
+	{
+		close(pipefd[0][1]);
+		close(pipefd[1][0]);
+		dup2(pipefd[0][0], STDIN_FILENO);
+		close(pipefd[0][0]);
+		dup2(pipefd[1][1], STDOUT_FILENO);
+		close(pipefd[1][1]);
+		execve("/usr/bin/uniq", cmd2, NULL);
+		perror("execve");
+	}
+	pid[2] = fork();
+	if (pid[2] == 0)
+	{
+		close(pipefd[1][1]);
+		close(pipefd[0][0]);
+		close(pipefd[0][1]);
+		dup2(pipefd[1][0], STDIN_FILENO);
+		close(pipefd[1][0]);
+		execve("/usr/bin/grep", cmd3, NULL);
+		perror("execve");
+	}
+	else
+	{
+
+		int status;
+		i = 0;
+		while(i < 2)
+		{
+			close(pipefd[i][0]);
+			close(pipefd[i][1]);
+			i++;
+		}
+		i = 0;
+		while (i < 3)
+		{
+			waitpid(pid[i], &status, 0);
+			i++;
+		}
+		exit(status);
+	}
 }
