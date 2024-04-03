@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   here_doc_bonus.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
+/*   By: Achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 21:49:47 by achakkaf          #+#    #+#             */
-/*   Updated: 2024/03/31 23:30:41 by achakkaf         ###   ########.fr       */
+/*   Updated: 2024/04/03 23:04:50 by Achakkaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,15 +64,16 @@ void end_file(int fd)
 		str = get_next_line(fd);
 		free(tmp);
 	}
+	free(str);
 }
 
-#include <stdio.h>
-int main(int ac, char **av)
-{
-	// printf("%d\n", check_here_doc(av));
-	int fd = open("infile.txt", O_RDWR);
-	if (fd < 0)
-		exit(1);
-	end_file(fd);
-	write(fd, "Yess!!!!",8);
-}
+// #include <stdio.h>
+// int main(int ac, char **av)
+// {
+// 	// printf("%d\n", check_here_doc(av));
+// 	int fd = open("infile.txt", O_RDWR);
+// 	if (fd < 0)
+// 		exit(1);
+// 	end_file(fd);
+// 	write(fd, "Yess!!!!",8);
+// }

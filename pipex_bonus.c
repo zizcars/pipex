@@ -6,28 +6,35 @@
 /*   By: Achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/22 16:36:42 by Achakkaf          #+#    #+#             */
-/*   Updated: 2024/04/02 23:17:13 by Achakkaf         ###   ########.fr       */
+/*   Updated: 2024/04/03 23:12:28 by Achakkaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex_bonus.h"
 
-// int **open_pipes(int ac)
-// {
-// 	int pipes;
-// 	int pipefd[ac - 4][2];
-// 	int i;
-// 	i = 0;
-// 	pipes = ac - 4;
-// 	while (i < pipes)
-// 	{
-// 		if (pipe(pipefd[i]) == -1)
-// 			error("error in pipes");
-// 		i++;
-// 	}
-// }
+int **open_pip(int ac)
+{
+	int **pipfd;
+	int i;
 
-void close_pipes(int ac, int **pipfd)
+	i = 0;
+	pipfd = malloc((ac - 4) * sizeof(int *));
+	while (pipfd && i < ac - 4)
+	{
+		pipfd[i] = malloc(2 * sizeof(int));
+		if (pipfd[i] == NULL)
+			return (NULL);
+		if (pipe(pipfd[i]) == -1)
+		{
+			write(STDERR, "ERROR IN OPENING PIPES\n", 23);
+			exit(1);
+		}
+		i++;
+	}
+	return (pipfd);
+}
+
+void close_all(int **pipfd, int ac)
 {
 	int i;
 
@@ -36,119 +43,114 @@ void close_pipes(int ac, int **pipfd)
 	{
 		close(pipfd[i][0]);
 		close(pipfd[i][1]);
+		free(pipfd[i]);
 		i++;
+	}
+	free(pipfd);
+}
+
+void cmd_1(int ac, char **av, int **pipfd, char **env)
+{
+	int fd;
+	int pid;
+
+	pid = fork();
+	if (pid < 0)
+	{
+		write(STDERR, "problem fork\n", 13);
+		exit(1);
+	}
+	if (pid == 0)
+	{
+		fd = open(av[1], O_RDONLY);
+		if (fd < 0)
+		{
+			write(STDERR, "CAN'T OPEN FILE", 15);
+			exit(1);
+		}
+		redirection(fd, STDIN);
+		redirection(pipfd[0][1], STDOUT);
+		close_all(pipfd, ac);
+		exec_command(av[2], env);
 	}
 }
 
-void first_child(int ac, char **av, int **pipfd, char **env)
+void last_cmd(int ac, char **av, char **env, int **pipfd)
 {
 	int fd;
+	int last_pipe;
+	int pid;
 
-	fd = open(av[1], O_RDONLY);
-	if (fd < 0)
-		error("can't open file for STDIN");
-	
-	redirection(fd, STDIN);
-	redirection(pipfd[0][1], STDOUT);
-	close_pipes(ac, pipfd);
-	close(fd);
-	exec_command(av[2], env);
+	last_pipe = ac - 5;
+	pid = fork();
+	if (pid < 0)
+	{
+		write(STDERR, "CAN'T OPEN FILE", 15);
+		exit(1);
+	}
+	else if (pid == 0)
+	{
+		fd = open(av[ac - 1], O_CREAT | O_WRONLY, 0644);
+		if (fd < 0)
+		{
+			write(STDERR, "CAN'T OPEN FILE", 15);
+			exit(1);
+		}
+		redirection(pipfd[last_pipe][0], STDIN);
+		redirection(fd, STDOUT);
+		close_all(pipfd, ac);
+		exec_command(av[ac - 2], env);
+	}
 }
 
-// void child_n(int ac, char **av, int **pipfd, int pip_i, char **env)
-// {
-// 	redirection(pipfd[pip_i][0], STDIN);
-// 	redirection(pipfd[pip_i + 1][1], STDOUT);
-// 	close_pipes(pipfd, ac);
-// 	exec_command(av[]);
-// }
-
-void last_child(int ac, char **av, int **pipfd, char **env)
+void cmd_n(int ac, char **av, char **env, int **pipfd)
 {
-	int fd;
+	int i;
+	int pip_i;
+	int pid;
 
-	fd = open(av[ac - 1], O_CREAT | O_WRONLY, 0666);
-	if (fd < 0)
-		error("can't open file 4 in main");
-	redirection(pipfd[ac - 5][0], STDIN);
-	redirection(fd, STDOUT);
-	close_pipes(ac, pipfd);
-	close(fd);
-	exec_command(av[ac - 2], env);
+	pip_i = 0;
+	i = 3;
+	while (i < ac - 2)
+	{
+		pid = fork();
+		if (pid < 0)
+		{
+			write(STDERR, "Problem fork\n", 13);
+			exit(1);
+		}
+		else if (pid == 0)
+		{
+			redirection(pipfd[pip_i][0], STDIN);
+			redirection(pipfd[pip_i + 1][1], STDOUT);
+			close_all(pipfd, ac);
+			exec_command(av[i], env);
+		}
+		i++;
+		pip_i++;
+	}
 }
-
-void c_child(pid_t *child)
-{
-	*child = fork();
-	if (*child < 0)
-		error("fork1 error in main");
-}
-
-/*  0       1   2    3     3        n   n + 1   argc = n + 2
-./pipex file1 cmd1 cmd2 cmd3 ... cmdn file2
-./pipex file1 cmd1 cmd2 file2
-*/
 
 int main(int ac, char **av, char **env)
 {
 	int **pipfd;
 	int i;
-	pid_t pid[ac - 3];
-	int pid_i;
-	int cmd_i;
 
-	pid_i = 0;
-	i = 0;
-	pipfd = malloc((ac - 4) * sizeof(int));
-	while (i < ac - 4)
+	if (ac < 6)
 	{
-		pipfd[i] = malloc(2 * sizeof(int));
-		if (pipe(pipfd[i]))
-			error("error in pipes");
-		i++;
+		write(STDERR, "syntax error: <file1> <cmd1> ... <cmdn> <file2>\n", 48);
+		exit(1);
 	}
-	c_child(&pid[pid_i]);
-	if (pid[pid_i] == 0)
-		first_child(ac, av, pipfd, env);
-	pid_i++;
-	cmd_i = 0;
 	i = 0;
-	while (cmd_i < ac - 5)
+	pipfd = open_pip(ac);
+	cmd_1(ac, av, pipfd, env);
+	cmd_n(ac, av, env, pipfd);
+	last_cmd(ac, av, env, pipfd);
+	close_all(pipfd, ac);
+	i = 2;
+	while (i < ac - 3)
 	{
-		pid_i++;
-		c_child(&pid[pid_i]);
-		if (pid[pid_i] == 0)
-		{
-			ft_printf("pid: %d\n", i);
-			redirection(pipfd[i][0], STDIN);
-			redirection(pipfd[i + 1][1], STDOUT);
-			close_pipes(ac, pipfd);
-			exec_command(av[cmd_i + 3], env);
-		}
-		cmd_i++;
+		wait(NULL);
 		i++;
-	}
-	c_child(&pid[pid_i]);
-	if (pid[pid_i] == 0)
-		last_child(ac, av, pipfd, env);
-	pid_i++;
-	if (pid[pid_i] != 0)
-	{
-		i = 0;
-		while (i < ac - 4)
-		{
-			close(pipfd[i][0]);
-			close(pipfd[i][1]);
-			i++;
-		}
-		i = 0;
-		int status;
-		while (i < pid_i)
-		{
-			waitpid(pid[i++], &status, 0);
-			if (status < 0)
-				exit(status);
-		}
-		
 	}
 }

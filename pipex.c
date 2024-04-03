@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: Achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/22 16:36:42 by Achakkaf          #+#    #+#             */
-/*   Updated: 2024/03/29 22:32:20 by Achakkaf         ###   ########.fr       */
+/*   Updated: 2024/04/03 23:13:21 by Achakkaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ void last_child(char **argv, int *pipfd, char **env)
 {
 	int fd;
 
-	fd = open(argv[4], O_CREAT | O_WRONLY, 0666);
+	fd = open(argv[4], O_CREAT | O_WRONLY, 0644);
 	if (fd < 0)
 		error("can't open file 4 in main");
 	close(pipfd[1]);
