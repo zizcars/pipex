@@ -6,16 +6,16 @@
 /*   By: Achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 21:49:47 by achakkaf          #+#    #+#             */
-/*   Updated: 2024/04/04 18:32:47 by Achakkaf         ###   ########.fr       */
+/*   Updated: 2024/04/04 20:20:44 by Achakkaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex_bonus.h"
 
-int **open_pip(int ac)
+int	**open_pip(int ac)
 {
-	int **pipfd;
-	int i;
+	int	**pipfd;
+	int	i;
 
 	i = 0;
 	pipfd = malloc((ac - 4) * sizeof(int *));
@@ -31,9 +31,9 @@ int **open_pip(int ac)
 	return (pipfd);
 }
 
-void close_all(int **pipfd, int ac)
+void	close_all(int **pipfd, int ac)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (i < ac - 4)
@@ -46,10 +46,10 @@ void close_all(int **pipfd, int ac)
 	free(pipfd);
 }
 
-void limiter_stop(char *limiter, int fd)
+void	limiter_stop(char *limiter, int fd)
 {
-	char *line;
-	char *tmp;
+	char	*line;
+	char	*tmp;
 
 	line = NULL;
 	if (limiter == NULL)
@@ -63,15 +63,15 @@ void limiter_stop(char *limiter, int fd)
 		if (line == NULL)
 			print_error("I find end of file\n");
 		if (ft_strcmp(line, limiter) == 1)
-			break;
+			break ;
 		write(fd, line, ft_strlen(line));
 	}
 	free(line);
 }
 
-void cmd_1_here_doc(int ac, char **av, int **pipfd, char **env)
+void	cmd_1_here_doc(int ac, char **av, int **pipfd, char **env)
 {
-	int pid;
+	int	pid;
 
 	pid = fork();
 	if (pid < 0)
@@ -86,11 +86,11 @@ void cmd_1_here_doc(int ac, char **av, int **pipfd, char **env)
 	}
 }
 
-void last_cmd_here_doc(int ac, char **av, char **env, int **pipfd)
+void	last_cmd_here_doc(int ac, char **av, char **env, int **pipfd)
 {
-	int fd;
-	int last_pipe;
-	int pid;
+	int	fd;
+	int	last_pipe;
+	int	pid;
 
 	last_pipe = ac - 5;
 	pid = fork();

@@ -6,13 +6,13 @@
 /*   By: Achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/12 09:41:34 by Achakkaf          #+#    #+#             */
-/*   Updated: 2024/03/29 22:47:04 by Achakkaf         ###   ########.fr       */
+/*   Updated: 2024/04/04 20:26:53 by Achakkaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex_bonus.h"
 
-void skip_q(char *s, int *i)
+void	skip_q(char *s, int *i)
 {
 	if (s[*i] == '\'' || s[*i] == '"')
 	{
@@ -22,11 +22,11 @@ void skip_q(char *s, int *i)
 	}
 }
 
-int new_cwords(char *s)
+int	new_cwords(char *s)
 {
-	int i;
-	int count;
-	int inword;
+	int	i;
+	int	count;
+	int	inword;
 
 	i = 0;
 	inword = 1;
@@ -50,10 +50,10 @@ int new_cwords(char *s)
 	return (count);
 }
 
-char *new_substr(char *str, int start, int end)
+char	*new_substr(char *str, int start, int end)
 {
-	char *sstr;
-	int i;
+	char	*sstr;
+	int		i;
 
 	i = 0;
 	if (str == NULL)
@@ -71,13 +71,32 @@ char *new_substr(char *str, int start, int end)
 	return (sstr);
 }
 
-char **split_cmd(char *command)
+void	split_cmd2(char *cmd, int *start, int *end, int *in)
 {
-	char **cmd;
-	int end;
-	int start;
-	int i;
-	int in;
+	while (cmd[*end] == ' ' && cmd[*end])
+		(*end)++;
+	*start = *end;
+	while (cmd[*end] != ' ' && cmd[*end])
+	{
+		if (cmd[*end] == '\'' || cmd[*end] == '"')
+		{
+			(*end)++;
+			*start = *end;
+			while ((cmd[*end] != '\'' && cmd[*end] != '"') && cmd[*end])
+				(*end)++;
+			*in = 1;
+		}
+		(*end)++;
+	}
+}
+
+char	**split_cmd(char *command)
+{
+	char	**cmd;
+	int		end;
+	int		start;
+	int		i;
+	int		in;
 
 	in = 0;
 	i = 0;
@@ -85,29 +104,14 @@ char **split_cmd(char *command)
 	cmd = malloc((new_cwords(command) + 1) * sizeof(char *));
 	while (cmd && command && command[end])
 	{
-		while (command[end] == ' ' && command[end])
-			end++;
-		start = end;
-		while (command[end] != ' ' && command[end])
+		split_cmd2(command, &start, &end, &in);
+		if (start != end)
 		{
-			if (command[end] == '\'' || command[end] == '"')
-			{
-				start = ++end;
-				while ((command[end] != '\'' && command[end] != '"') && command[end])
-					end++;
-				in = 1;
-			}
-			end++;
-		}
-		if (in && start != end)
-		{
-			cmd[i] = new_substr(command, start, end - 1);
+			cmd[i] = new_substr(command, start, end - in);
 			in = 0;
 		}
-		else if (start != end)
-			cmd[i] = new_substr(command, start, end);
 		else
-			break;
+			break ;
 		i++;
 	}
 	if (cmd)

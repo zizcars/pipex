@@ -6,22 +6,22 @@
 /*   By: Achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/22 16:36:42 by Achakkaf          #+#    #+#             */
-/*   Updated: 2024/04/04 18:38:41 by Achakkaf         ###   ########.fr       */
+/*   Updated: 2024/04/04 20:23:16 by Achakkaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex_bonus.h"
 
-void print_error(char *str)
+void	print_error(char *str)
 {
 	write(STDERR, str, ft_strlen(str));
 	exit(1);
 }
 
-void cmd_1(int ac, char **av, int **pipfd, char **env)
+void	cmd_1(int ac, char **av, int **pipfd, char **env)
 {
-	int fd;
-	int pid;
+	int	fd;
+	int	pid;
 
 	pid = fork();
 	if (pid < 0)
@@ -39,11 +39,11 @@ void cmd_1(int ac, char **av, int **pipfd, char **env)
 	}
 }
 
-void last_cmd(int ac, char **av, char **env, int **pipfd)
+void	last_cmd(int ac, char **av, char **env, int **pipfd)
 {
-	int fd;
-	int last_pipe;
-	int pid;
+	int	fd;
+	int	last_pipe;
+	int	pid;
 
 	last_pipe = ac - 5;
 	pid = fork();
@@ -51,7 +51,7 @@ void last_cmd(int ac, char **av, char **env, int **pipfd)
 		print_error("can't create a child process\n");
 	else if (pid == 0)
 	{
-		fd = open(av[ac - 1], O_CREAT | O_NOFOLLOW |O_WRONLY, 0644);
+		fd = open(av[ac - 1], O_CREAT | O_NOFOLLOW | O_WRONLY, 0644);
 		if (fd < 0)
 			print_error("can't the create output file\n");
 		redirection(pipfd[last_pipe][0], STDIN);
@@ -62,11 +62,11 @@ void last_cmd(int ac, char **av, char **env, int **pipfd)
 	}
 }
 
-void cmd_n(int ac, char **av, char **env, int **pipfd)
+void	cmd_n(int ac, char **av, char **env, int **pipfd)
 {
-	int i;
-	int pip_i;
-	int pid;
+	int	i;
+	int	pip_i;
+	int	pid;
 
 	pip_i = 0;
 	i = 3;
@@ -87,10 +87,10 @@ void cmd_n(int ac, char **av, char **env, int **pipfd)
 	}
 }
 
-int main(int ac, char **av, char **env)
+int	main(int ac, char **av, char **env)
 {
-	int **pipfd;
-	int i;
+	int	**pipfd;
+	int	i;
 
 	if (ac < 6)
 		print_error("syntax error: file1 cmd1 ... cmdn file2\n");
@@ -111,7 +111,7 @@ int main(int ac, char **av, char **env)
 	i = 2;
 	while (i < ac - 3)
 	{
-		wait(NULL); // i miss the children status;
+		wait(NULL);
 		i++;
 	}
 }

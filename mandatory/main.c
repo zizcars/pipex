@@ -1,25 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex.c                                            :+:      :+:    :+:   */
+/*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: Achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/22 16:36:42 by Achakkaf          #+#    #+#             */
-/*   Updated: 2024/04/04 16:04:02 by Achakkaf         ###   ########.fr       */
+/*   Updated: 2024/04/04 20:11:32 by Achakkaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-void first_child(char **argv, int *pipfd, char **env)
+void	first_child(char **argv, int *pipfd, char **env)
 {
-	int fd;
+	int	fd;
 
 	close(pipfd[0]);
 	fd = open(argv[1], O_RDONLY);
 	if (fd < 0)
-		error("can't open file for STDIN");
+		error("The input file not found\n");
 	redirection(fd, STDIN);
 	redirection(pipfd[1], STDOUT);
 	close(pipfd[1]);
@@ -27,13 +27,13 @@ void first_child(char **argv, int *pipfd, char **env)
 	exec_command(argv[2], env);
 }
 
-void last_child(char **argv, int *pipfd, char **env)
+void	last_child(char **argv, int *pipfd, char **env)
 {
-	int fd;
+	int	fd;
 
 	fd = open(argv[4], O_CREAT | O_WRONLY, 0644);
 	if (fd < 0)
-		error("can't open file 4 in main");
+		error("The output file not found\n");
 	close(pipfd[1]);
 	redirection(fd, STDOUT);
 	redirection(pipfd[0], STDIN);
@@ -42,24 +42,23 @@ void last_child(char **argv, int *pipfd, char **env)
 	exec_command(argv[3], env);
 }
 
-void c_child(pid_t *child)
+void	c_child(pid_t *child)
 {
 	*child = fork();
 	if (*child < 0)
-		error("fork1 error in main");
+		error("I can't create a child process\n");
 }
 
-int main(int argc, char **argv, char **env)
+int	main(int argc, char **argv, char **env)
 {
-	pid_t child1;
-	pid_t child2;
-	int pipfd[2];
-	int status;
+	pid_t	child1;
+	pid_t	child2;
+	int		pipfd[2];
 
 	if (argc != 5)
-		exit(0);
+		error("syntax error: file1 cmd1 cmd2 file2\n");
 	if (pipe(pipfd))
-		error("pipe error in main");
+		error("pipe error\n");
 	c_child(&child1);
 	if (child1 == 0)
 		first_child(argv, pipfd, env);
@@ -70,9 +69,7 @@ int main(int argc, char **argv, char **env)
 	{
 		close(pipfd[0]);
 		close(pipfd[1]);
-		waitpid(child1, &status, 0);
-		waitpid(child2, &status, 0);
-		if (status < 0)
-			error("There is a problem");
+		waitpid(child1, NULL, 0);
+		waitpid(child2, NULL, 0);
 	}
 }
