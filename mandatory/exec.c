@@ -6,72 +6,18 @@
 /*   By: Achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/22 22:34:42 by Achakkaf          #+#    #+#             */
-/*   Updated: 2024/04/02 23:18:56 by Achakkaf         ###   ########.fr       */
+/*   Updated: 2024/04/04 18:38:10 by Achakkaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-/// @brief print error message using perror
-/// @param error_massege
+
 void error(char *error_message)
 {
 	perror(error_message);
 	exit(1);
 }
-
-/// @brief execute whereis command to find a path of a command
-/// @param command
-// void exec_whereis(char *command)
-// {
-// 	int fd;
-// 	int dup_check;
-// 	char *cmd[3];
-// 	cmd[0] = "whereis";
-// 	cmd[1] = command;
-// 	cmd[2] = NULL;
-// 	fd = open("path", O_CREAT | O_WRONLY, 0777);
-// 	if (fd < 0)
-// 		error("can't creat path file");
-// 	dup_check = dup2(fd, STDOUT);
-// 	if (dup_check < 0)
-// 		error("failed in dup2 in exec_whereis");
-// 	execve("/usr/bin/whereis", cmd, NULL);
-// 	error("can't execute whereis command whereis");
-// }
-
-/// @brief find path of a command using whereis <command>
-/// @param command
-/// @param options
-/// @return path of the command
-// char *find_path(char *command)
-// {
-// 	pid_t pid;
-// 	int fd;
-// 	char *str;
-// 	int status;
-// 	str = NULL;
-// 	pid = fork();
-// 	if (pid < 0)
-// 		error("fork failed in find_path");
-// 	else if (pid == 0)
-// 		exec_whereis(command);
-// 	else
-// 	{
-// 		wait(&status);
-// 		if (status != 0)
-// 			exit(status);
-// 		fd = open("path", O_RDONLY);
-// 		if (fd < 0)
-// 			error("file path not found");
-// 		str = get_next_line(fd);
-// 		if (str == NULL)
-// 			error("command not found");
-// 		close(fd);
-// 		// unlink("path");
-// 	}
-// 	return (str);
-// }
 
 char *path_(char *p, char *command, int i)
 {
@@ -125,8 +71,7 @@ char *find_path(char *command, char **env)
 	return (path_(p, command, 0));
 }
 
-/// @brief execute a command
-/// @param command
+
 void exec_command(char *command, char **env)
 {
 	char *cmd_path;
@@ -138,9 +83,7 @@ void exec_command(char *command, char **env)
 	error("command not found");
 }
 
-/// @brief redirection a file descriptor
-/// @param new_fd
-/// @param old_fd
+
 void redirection(int new_fd, int old_fd)
 {
 	int check;

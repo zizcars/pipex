@@ -1,52 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex_bonus.c                                      :+:      :+:    :+:   */
+/*   main_bonus.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: Achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/22 16:36:42 by Achakkaf          #+#    #+#             */
-/*   Updated: 2024/04/03 23:12:28 by Achakkaf         ###   ########.fr       */
+/*   Updated: 2024/04/04 18:38:41 by Achakkaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex_bonus.h"
 
-int **open_pip(int ac)
+void print_error(char *str)
 {
-	int **pipfd;
-	int i;
-
-	i = 0;
-	pipfd = malloc((ac - 4) * sizeof(int *));
-	while (pipfd && i < ac - 4)
-	{
-		pipfd[i] = malloc(2 * sizeof(int));
-		if (pipfd[i] == NULL)
-			return (NULL);
-		if (pipe(pipfd[i]) == -1)
-		{
-			write(STDERR, "ERROR IN OPENING PIPES\n", 23);
-			exit(1);
-		}
-		i++;
-	}
-	return (pipfd);
-}
-
-void close_all(int **pipfd, int ac)
-{
-	int i;
-
-	i = 0;
-	while (i < ac - 4)
-	{
-		close(pipfd[i][0]);
-		close(pipfd[i][1]);
-		free(pipfd[i]);
-		i++;
-	}
-	free(pipfd);
+	write(STDERR, str, ft_strlen(str));
+	exit(1);
 }
 
 void cmd_1(int ac, char **av, int **pipfd, char **env)
@@ -56,21 +25,16 @@ void cmd_1(int ac, char **av, int **pipfd, char **env)
 
 	pid = fork();
 	if (pid < 0)
-	{
-		write(STDERR, "problem fork\n", 13);
-		exit(1);
-	}
+		print_error("can't create a child process\n");
 	if (pid == 0)
 	{
-		fd = open(av[1], O_RDONLY);
+		fd = open(av[1], O_RDONLY | O_NOFOLLOW);
 		if (fd < 0)
-		{
-			write(STDERR, "CAN'T OPEN FILE", 15);
-			exit(1);
-		}
+			print_error("can't open the input file\n");
 		redirection(fd, STDIN);
 		redirection(pipfd[0][1], STDOUT);
 		close_all(pipfd, ac);
+		close(fd);
 		exec_command(av[2], env);
 	}
 }
@@ -84,21 +48,16 @@ void last_cmd(int ac, char **av, char **env, int **pipfd)
 	last_pipe = ac - 5;
 	pid = fork();
 	if (pid < 0)
-	{
-		write(STDERR, "CAN'T OPEN FILE", 15);
-		exit(1);
-	}
+		print_error("can't create a child process\n");
 	else if (pid == 0)
 	{
-		fd = open(av[ac - 1], O_CREAT | O_WRONLY, 0644);
+		fd = open(av[ac - 1], O_CREAT | O_NOFOLLOW |O_WRONLY, 0644);
 		if (fd < 0)
-		{
-			write(STDERR, "CAN'T OPEN FILE", 15);
-			exit(1);
-		}
+			print_error("can't the create output file\n");
 		redirection(pipfd[last_pipe][0], STDIN);
 		redirection(fd, STDOUT);
 		close_all(pipfd, ac);
+		close(fd);
 		exec_command(av[ac - 2], env);
 	}
 }
@@ -115,10 +74,7 @@ void cmd_n(int ac, char **av, char **env, int **pipfd)
 	{
 		pid = fork();
 		if (pid < 0)
-		{
-			write(STDERR, "Problem fork\n", 13);
-			exit(1);
-		}
+			print_error("can't create a child process\n");
 		else if (pid == 0)
 		{
 			redirection(pipfd[pip_i][0], STDIN);
@@ -137,20 +93,25 @@ int main(int ac, char **av, char **env)
 	int i;
 
 	if (ac < 6)
-	{
-		write(STDERR, "syntax error: <file1> <cmd1> ... <cmdn> <file2>\n", 48);
-		exit(1);
-	}
-	i = 0;
+		print_error("syntax error: file1 cmd1 ... cmdn file2\n");
 	pipfd = open_pip(ac);
-	cmd_1(ac, av, pipfd, env);
-	cmd_n(ac, av, env, pipfd);
-	last_cmd(ac, av, env, pipfd);
+	if (ft_strcmp(av[1], "here_doc"))
+	{
+		cmd_1_here_doc(ac, av, pipfd, env);
+		cmd_n(ac, av, env, pipfd);
+		last_cmd_here_doc(ac, av, env, pipfd);
+	}
+	else
+	{
+		cmd_1(ac, av, pipfd, env);
+		cmd_n(ac, av, env, pipfd);
+		last_cmd(ac, av, env, pipfd);
+	}
 	close_all(pipfd, ac);
 	i = 2;
 	while (i < ac - 3)
 	{
-		wait(NULL);
+		wait(NULL); // i miss the children status;
 		i++;
 	}
 }

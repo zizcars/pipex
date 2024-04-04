@@ -6,7 +6,7 @@
 /*   By: Achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 16:36:33 by Achakkaf          #+#    #+#             */
-/*   Updated: 2024/04/02 23:20:06 by Achakkaf         ###   ########.fr       */
+/*   Updated: 2024/04/04 18:24:28 by Achakkaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,9 @@
 #include <string.h>
 #include <sys/wait.h>
 
-#include "mylib/ft_printf.h"
-#include "mylib/libft.h"
-#include "mylib/get_next_line.h"
+#include "../mylib/ft_printf.h"
+#include "../mylib/libft.h"
+#include "../mylib/get_next_line.h"
 
 #define STDIN 0
 #define STDOUT 1
@@ -33,5 +33,11 @@ char **split_cmd(char *command);
 void error(char *error_message);
 void exec_command(char *command, char **env);
 void redirection(int new_fd, int old_fd);
+int **open_pip(int ac);
+void close_all(int **pipfd, int ac);
+void print_error(char *str);
 
+void limiter_stop(char *limiter, int fd);
+void cmd_1_here_doc(int ac, char **av, int **pipfd, char **env);
+void last_cmd_here_doc(int ac, char **av, char **env, int **pipfd);
 #endif
