@@ -1,41 +1,79 @@
-NAME=pipex
-CFLAGS= -Wall -Wextra -Werror #-fsanitize=address
-FT_LIBS= mylib/mylib.a
+# ====================================
+#  ____  _          _               
+# |  _ \(_)___  ___| |_ _ __ _   _  
+# | |_) | / __|/ __| __| '__| | | | 
+# |  __/| \__ \ (__| |_| |  | |_| | 
+# |_|   |_|___/\___|\__|_|   \__, | 
+#                             |___/ 
+#         PIPEX PROJECT
+# ====================================
 
-CFILES= mandatory/main.c \
-		mandatory/split_cmd.c \
-		mandatory/exec.c 
+# === Colors ===
+GREEN = \033[0;32m
+BLUE = \033[0;34m
+YELLOW = \033[1;33m
+RED = \033[0;31m
+RESET = \033[0m
 
-CBFILES=bonus/main_bonus.c \
-		bonus/split_cmd_bonus.c \
-		bonus/exec_bonus.c \
-		bonus/here_doc_bonus.c 
+# === Compiler and Flags ===
+CC = cc
+CFLAGS = -Wall -Wextra -Werror
 
-OFILES=$(CFILES:.c=.o)
-BFILES=$(CBFILES:.c=.o)
+# === Project Name ===
+NAME = pipex
 
-%.o:%.c mandatory/pipex.h bonus/pipex_bonus.h
-	cc $(CFLAGS) -c $< -o $@
+# === Directories ===
+SRC_DIR = src
+BONUS_DIR = bonus
+INCLUDES = includes
+LIB_DIR = lib
+
+# === Files ===
+FT_LIBS = $(LIB_DIR)/libft.a
+
+CFILES = $(SRC_DIR)/main.c \
+         $(SRC_DIR)/split_cmd.c \
+         $(SRC_DIR)/exec.c
+
+CBFILES = $(BONUS_DIR)/main_bonus.c \
+          $(BONUS_DIR)/split_cmd_bonus.c \
+          $(BONUS_DIR)/exec_bonus.c \
+          $(BONUS_DIR)/here_doc_bonus.c
+
+OFILES = $(CFILES:.c=.o)
+BFILES = $(CBFILES:.c=.o)
+
+# === Rules ===
+%.o: %.c $(INCLUDES)/pipex.h $(INCLUDES)/pipex_bonus.h
+	@echo "$(YELLOW)[Compiling]$(RESET) $<"
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 all: $(NAME)
 
 $(NAME): $(OFILES)
-	@make -C mylib
-	cc $(CFLAGS) $(OFILES) $(FT_LIBS) -o $(NAME)
+	@echo "$(GREEN)[Building]$(RESET) Mandatory part..."
+	@make -C $(LIB_DIR)
+	@$(CC) $(CFLAGS) $(OFILES) $(FT_LIBS) -o $(NAME)
+	@echo "$(BLUE)[Success]$(RESET) Executable created: $(NAME)"
 
 bonus: $(BFILES)
-	@Make -C mylib
-	cc $(CFLAGS) $(BFILES) $(FT_LIBS) -o $(NAME)
+	@echo "$(GREEN)[Building]$(RESET) Bonus part..."
+	@make -C $(LIB_DIR)
+	@$(CC) $(CFLAGS) $(BFILES) $(FT_LIBS) -o $(NAME)
+	@echo "$(BLUE)[Success]$(RESET) Bonus executable created: $(NAME)"
 
 clean:
+	@echo "$(RED)[Cleaning]$(RESET) Object files..."
 	@rm -f $(OFILES) $(BFILES)
-	@make clean -C mylib
+	@make clean -C $(LIB_DIR)
+	@echo "$(BLUE)[Done]$(RESET) Cleaned object files."
 
 fclean: clean
+	@echo "$(RED)[Cleaning]$(RESET) Executable..."
 	@rm -f $(NAME)
-	@make fclean -C mylib
-
+	@make fclean -C $(LIB_DIR)
+	@echo "$(BLUE)[Done]$(RESET) All cleaned."
 
 re: fclean all
 
-.PHONY: clean libs bonus
+.PHONY: all bonus clean fclean re

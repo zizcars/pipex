@@ -20,9 +20,9 @@
 # include <string.h>
 # include <sys/wait.h>
 
-# include "../mylib/ft_printf.h"
-# include "../mylib/libft.h"
-# include "../mylib/get_next_line.h"
+# include "../lib/ft_printf.h"
+# include "../lib/libft.h"
+# include "../lib/get_next_line.h"
 
 # define STDIN 0
 # define STDOUT 1

@@ -3,16 +3,22 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+         #
+#    By: Achakkaf <zizcarschak1@gmail.com>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/12/10 17:20:23 by Achakkaf          #+#    #+#              #
-#    Updated: 2024/03/31 22:48:13 by achakkaf         ###   ########.fr        #
+#    Updated: 2024/03/17 19:34:36 by Achakkaf         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
+GREEN = \033[0;32m
+BLUE = \033[0;34m
+YELLOW = \033[1;33m
+RED = \033[0;31m
+RESET = \033[0m
+
 CC = cc
 CFLAGS  = -Wall -Wextra -Werror
-NAME = mylib.a 
+NAME = libft.a 
 
 CFILES =	ft_atoi.c \
 			ft_bzero.c \
@@ -47,8 +53,9 @@ CFILES =	ft_atoi.c \
 			ft_putchar_fd.c \
 			ft_putstr_fd.c \
 			ft_putendl_fd.c \
-			ft_putnbr_fd.c \
-			ft_lstnew_bonus.c \
+			ft_putnbr_fd.c 
+
+BFILES =	ft_lstnew_bonus.c \
 			ft_lstadd_front_bonus.c \
 			ft_lstsize_bonus.c \
 			ft_lstlast_bonus.c \
@@ -57,32 +64,37 @@ CFILES =	ft_atoi.c \
 			ft_lstclear_bonus.c \
 			ft_lstiter_bonus.c \
 			ft_lstmap_bonus.c \
-			ft_printf.c \
-			ft_putaddress.c \
-			ft_puthex.c \
-			ft_putnbr.c \
-			ft_uputnbr.c \
-			ft_putchar.c \
-			ft_putstr.c \
-			get_next_line.c \
-			get_next_line_utils.c 
+			
 
 OFILES = $(CFILES:.c=.o)
+OBFILES = $(BFILES:.c=.o)
 
 all : $(NAME)
 
 $(NAME): $(OFILES)
+	@echo "$(GREEN)[Compiling]$(RESET) Creating $(NAME)..."
 	@ar rc $(NAME) $(OFILES)
+	@echo "$(BLUE)[Success]$(RESET) $(NAME) built!"
 
-%.o:%.c libft.h ft_printf.h get_next_line.h
-	$(CC) $(CFLAGS) -c $< -o $@
+%.o:%.c libft.h
+	@echo "$(YELLOW)[Compiling]$(RESET) $<"
+	@$(CC) $(CFLAGS) -c $< -o $@
+
+bonus : $(OBFILES)
+	@echo "$(GREEN)[Compiling]$(RESET) Creating bonus: $(BNAME)..."
+	@ar rc $(NAME) $(OBFILES)
+	@echo "$(BLUE)[Success]$(RESET) $(BNAME) built!"
 
 clean : 
-	@rm -f $(OFILES)
+	@echo "$(RED)[Cleaning]$(RESET) Object files..."
+	@rm -f $(OFILES) $(OBFILES)
+	@echo "$(BLUE)[Done]$(RESET) Object files removed."
 
 fclean: clean
+	@echo "$(RED)[Cleaning]$(RESET) Executables..."
 	@rm -f $(NAME)
+	@echo "$(BLUE)[Done]$(RESET) All cleaned."
 
 re : fclean all
 
-.PHONY: clean 
+.PHONY: all clean fclean re bonus
